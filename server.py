@@ -25,8 +25,7 @@ def executeMain(transcriptID):
 		else:
 			print('File saved at: {}'.format(path))
 			path = path.split('{}.docx'.format(transcriptID))[0]
-			print(path)
-			return static_file('{}.docx'.format(transcriptID), root=path, download='{}.docx'.format(transcriptID))
+			return static_file('{}.docx'.format(transcriptID), root=path)
 
 
 if __name__ == '__main__':
