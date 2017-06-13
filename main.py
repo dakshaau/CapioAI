@@ -110,7 +110,7 @@ def createDocx(results, transcriptID):
 		[
 			{
 				'result': <value>
-				'result_index': <value>
+				'result_index': <int value>
 			}
 		]
 		'''
@@ -120,6 +120,8 @@ def createDocx(results, transcriptID):
 		assert type(results[0]) is dict
 		assert 'result_index' in results[0]
 		assert 'result' in results[0]
+		assert type(results[0]['result_index']) is int
+		assert -1 < results[0]['result_index'] < len(results)
 	except AssertionError:
 		return None, "Improper 'results' format!"
 	
@@ -149,6 +151,7 @@ def createDocx(results, transcriptID):
 			assert type(alternatives[0]['alternative'][0]) is dict
 			assert 'confidence' in alternatives[0]['alternative'][0]
 			assert (type(alternatives[0]['alternative'][0]['confidence']) is float) or (type(alternatives[0]['alternative'][0]['confidence']) is int)
+			assert alternatives[0]['alternative'][0]['confidence'] <= 1
 		except AssertionError:
 			return None, "Improper 'result' format!"
 
@@ -178,7 +181,9 @@ def createDocx(results, transcriptID):
 			assert 'confidence' in scentence['words'][0]
 			assert 'word' in scentence['words'][0]
 			assert (type(scentence['words'][0]['from']) is float) or (type(scentence['words'][0]['from']) is int)
+			assert scentence['words'][0]['from'] >= 0
 			assert (type(scentence['words'][0]['confidence']) is float) or (type(scentence['words'][0]['confidence']) is int)
+			assert scentence['words'][0]['confidence'] <= 1
 			assert type(scentence['words'][0]['word']) is str
 		except AssertionError:
 			return None, "Improper 'scentence' format!"
