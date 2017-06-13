@@ -1,8 +1,9 @@
 import requests, json
+import os, sys
+from requests.exceptions import HTTPError
 from docx import Document
 from docx.enum.dml import MSO_THEME_COLOR
 from docx.shared import RGBColor
-# from datetime import timedelta
 
 class time(object):
 	hours = 0
@@ -21,16 +22,36 @@ class time(object):
 
 
 def getTranscript(transcriptID, APIKey):
+	Error_codes = {'301': 'Moved Permanently',
+					'302': 'Found',
+					'304': 'Not Modified',
+					'400': 'Bad Request',
+					'401': 'Unauthorized',
+					'403': 'Forbidden',
+					'404': 'Not Found',
+					'405': 'Method Not Allowed',
+					'410': 'Gone',
+					'415': 'Unsupported Media Type',
+					'422': 'Unprocessable Entry',
+					'429': 'Too Many Requests',
+					'500': 'Internal Server Error'
+					}
 	url = 'https://api.capio.ai/v1/speech/transcript/{}'.format(transcriptID)
-	param = {'apiKey': '{}'.format(APIKey), 'word_confidence': 'true'}
-	# param = json.dumps(param)
-	result = requests.get(url, headers=param)
+	head = {'apiKey': '{}'.format(APIKey), 'word_confidence': 'true'}
+	try:
+		result = requests.get(url, headers=head)
+	except ConnectionError:
+		print('Connection Failed')
+		return 'Unable to Connect'
 	transcript = []
 	try:
-		transcript = result.json()
-	except:
+		result.raise_for_status()
+	except HTTPError:
 		print('Error Code: {}'.format(result.status_code))
-	return transcript
+		return Error_codes[str(result.status_code)]
+	else:
+		transcript = result.json()
+		return transcript
 
 def createDocx(results, transcriptID):
 	purple = RGBColor(0x64, 0x62, 0x96)
@@ -39,13 +60,10 @@ def createDocx(results, transcriptID):
 	results = sorted(results, key=lambda x: x['result_index'])
 	for result in results:
 		alternatives = result['result']
-		# for index in range(bestTrans):
 		scentence = alternatives[0]['alternative'][0]
 		transcript = scentence['transcript']
 		words = scentence['words']
 		start_time = time(words[0]['from'])
-		# td = timedelta(seconds=start_time)
-		# print(start_time)
 		para = doc.add_paragraph('')
 		r = para.add_run('{}\t'.format(start_time))
 		r.bold = True
@@ -54,13 +72,28 @@ def createDocx(results, transcriptID):
 			r = para.add_run(' {}'.format(word['word']))
 			if word['confidence'] < 0.75:
 				r.font.color.rgb = red
-		# para = doc.add_paragraph(transcript)
 	doc.save('{}.docx'.format(transcriptID))
-	return doc
+	path = os.path.abspath('{}.docx'.format(transcriptID))
+	return doc, path
 
 if __name__ == '__main__':
 	transcriptID = '593f237fbcae700012ba8fcd'
 	APIKey = '262ac9a0c9ba4d179aad4c0b9b02120a'
+	if len(sys.argv) == 3:
+		transcriptID = sys.argv[1]
+		APIKey = sys.argv[2]
+	else:
+		print('Invalid Arguments!')
+		print('Usage:')
+		print()
+		print('python main.py <transcriptID> <APIKey>')
+		print()
+		exit()
 	transcript = getTranscript(transcriptID, APIKey)
-	doc = createDocx(transcript, transcriptID)
+	if type(transcript) is str:
+		# print(transcript)
+		pass
+	elif len(transcript) > 0:
+		doc, path = createDocx(transcript, transcriptID)
+		print('File saved at: {}'.format(path))
 	
