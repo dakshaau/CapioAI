@@ -42,3 +42,7 @@ if __name__ == '__main__':
 
 		port = int(sys.argv[2])
 		run(capio, host=ip, port=port, reloader=True)
+	else:
+		print('\nUsage:\n')
+		print('python server.py <IP> <PORT_integer>')
+		exit()
