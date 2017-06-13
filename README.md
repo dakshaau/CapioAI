@@ -6,6 +6,10 @@
 
 **Packages Required:** python-docx, requests, bottlepy
 
+### Testing:
+
+The code has assertions written into it. I haven't used any additional testing module to implement testcases
+
 ### Execution:
 
 There are two options available, either use the executable script or run the server which returns the static docx file if generated successfully.
