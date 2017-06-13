@@ -4,7 +4,7 @@
 
 **Language:** Python 3.5
 
-**Packages Required:** python-docx, requests, bottlepy
+**Packages Required:** python-docx, requests, bottle
 
 ### Testing:
 
