@@ -14,6 +14,8 @@ The code has assertions written into it. I haven't used any additional testing m
 
 There are two options available, either use the executable script or run the server which returns the static docx file if generated successfully.
 
+**NOTE:** Administrator priviledges may be needed
+
 To execute the script simply use the following command after navigating to the program directory:
 
 ```Batchfile
