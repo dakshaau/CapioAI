@@ -21,14 +21,38 @@ class timestamp(object):
 		self.millis *= 100
 
 	def __str__(self):
+		'''
+		Returns a string in the form 'HH:MM:SS.mm'
+		'''
 		return '{:02.0f}:{:02.0f}:{:02.0f}.{:02.0f}'.format(self.hours, self.mins, self.secs, self.millis)
 
 
 def getTranscript(transcriptID, APIKey):
 	'''
-	This function requests the capioapi for a transcript using the APIKey and TranscriptID
+	This function requests the capioai-api for a transcript using the APIKey and TranscriptID
 	provided by the user.
+
+	Parameters:
+		transcriptID: string
+		APIKey: string
+
+	Returns:
+		transcript: string, if error occured while handling the request, or
+							server rejects the request
+									OR
+					list of dicts, if server accepts the request
 	'''
+
+	try:
+		'''
+		Making sure that the input arguments are strings
+		'''
+		assert type(transcriptID) is str
+		assert type(APIKey) is str
+	except AssertionError:
+		return 'Invalid Parameter(s)'
+
+
 	Error_codes = {'301': 'Moved Permanently',
 					'302': 'Found',
 					'304': 'Not Modified',
@@ -66,16 +90,100 @@ def createDocx(results, transcriptID):
 	'''
 	This method creates a formattted document from the transcript
 	retreived from the getTrancript function
+
+	Parameters:
+		results: Response received from the CapioAI, list of dicts
+		transcriptID: TranscriptID used to retrieve response from CapioAI, string
+
+	Returns:
+		doc: docx.Document object if everything is fine, else NoneType
+		path: string, containing path to the saved document OR error message
 	'''
 	purple = RGBColor(0x64, 0x62, 0x96) # Replicating the timestamp color provided in the example file
 	red = RGBColor(0xfc, 0x2a, 0x35) # Replicating the 'red' color provided in the example file
 	doc = Document()
+
+	try:
+		'''
+		The following assertions make sure that the results argument parameter has the following format:
+
+		[
+			{
+				'result': <value>
+				'result_index': <value>
+			}
+		]
+		'''
+		assert type(transcriptID) is str
+		assert type(results) is list
+		assert len(results) > 0
+		assert type(results[0]) is dict
+		assert 'result_index' in results[0]
+		assert 'result' in results[0]
+	except AssertionError:
+		return None, "Improper 'results' format!"
+	
 	results = sorted(results, key=lambda x: x['result_index']) # Sorting the results in order just in case of some erroneous retreival from the server
 	for result in results:
+		
 		alternatives = result['result']
-		scentence = alternatives[0]['alternative'][0] # Only taking into account the best transcript
-		transcript = scentence['transcript']
-		words = scentence['words']
+
+		try:
+			'''
+			The following assertions make sure that each 'result' has the following format:
+
+			[
+				{
+					'alternative': [
+									{
+										'confidence': <float value>
+									}
+					]
+				}
+			]
+			'''
+			assert type(alternatives) is list
+			assert type(alternatives[0]) is dict
+			assert 'alternative' in alternatives[0]
+			assert type(alternatives[0]['alternative']) is list
+			assert type(alternatives[0]['alternative'][0]) is dict
+			assert 'confidence' in alternatives[0]['alternative'][0]
+			assert (type(alternatives[0]['alternative'][0]['confidence']) is float) or (type(alternatives[0]['alternative'][0]['confidence']) is int)
+		except AssertionError:
+			return None, "Improper 'result' format!"
+
+		alternatives = sorted(alternatives[0]['alternative'], key=lambda x: x['confidence'], reverse=True) # Sorting w.r.t scentence level confidence
+		scentence = alternatives[0] # Only taking into account the best transcript
+		del alternatives
+		
+		try:
+			'''
+			Thw following assertions make sure that 'scentence' has the folowing format:
+
+			{
+				'words':[
+						{
+							'from': <float value>
+							'confidence': <float value>
+							'word': <string>
+						}
+				]
+			}
+			'''
+			assert type(scentence) is dict
+			assert 'words' in scentence
+			assert type(scentence['words']) is list
+			assert type(scentence['words'][0]) is dict
+			assert 'from' in scentence['words'][0]
+			assert 'confidence' in scentence['words'][0]
+			assert 'word' in scentence['words'][0]
+			assert (type(scentence['words'][0]['from']) is float) or (type(scentence['words'][0]['from']) is int)
+			assert (type(scentence['words'][0]['confidence']) is float) or (type(scentence['words'][0]['confidence']) is int)
+			assert type(scentence['words'][0]['word']) is str
+		except AssertionError:
+			return None, "Improper 'scentence' format!"
+
+		words = sorted(scentence['words'], key = lambda x: x['from']) # Sorting w.r.t time
 		start_time = timestamp(words[0]['from'])
 
 		para = doc.add_paragraph('')
@@ -87,7 +195,7 @@ def createDocx(results, transcriptID):
 			if word['confidence'] < 0.75:
 				# Marking words with low confidence in red color
 				r.font.color.rgb = red
-				
+
 	doc.save('{}.docx'.format(transcriptID))
 	path = os.path.abspath('{}.docx'.format(transcriptID))
 	return doc, path
@@ -107,9 +215,11 @@ if __name__ == '__main__':
 		exit()
 	transcript = getTranscript(transcriptID, APIKey)
 	if type(transcript) is str:
-		# print(transcript)
-		pass
+		print(transcript)
 	elif len(transcript) > 0:
 		doc, path = createDocx(transcript, transcriptID)
-		print('File saved at: {}'.format(path))
+		if doc is None:
+			print(path)
+		else:
+			print('File saved at: {}'.format(path))
 	
