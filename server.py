@@ -10,6 +10,16 @@ def default():
 
 @capio.get('/transcript/<transcriptID>')
 def executeMain(transcriptID):
+	'''
+	This method executes the fucntions defined in main.py which retrieve transcript form CapioAI
+	and create a docx file.
+
+	Parameters:
+		transcriptID: string, used by the CapioAI API
+
+	Returns:
+		Either a binary docx file, if everything goes fine OR returns a string describing what went wrong
+	'''
 	APIKey = request.headers.get('apiKey')
 	transcript = getTranscript(transcriptID, APIKey)
 	if type(transcript) is str:
@@ -29,6 +39,9 @@ def executeMain(transcriptID):
 
 
 if __name__ == '__main__':
+	'''
+	I haven't added any checks for a valid IP, so invalid IPs may result in an error
+	'''
 	if len(sys.argv) == 3:
 		ip = sys.argv[1]
 		
