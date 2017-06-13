@@ -5,7 +5,10 @@ from docx import Document
 from docx.enum.dml import MSO_THEME_COLOR
 from docx.shared import RGBColor
 
-class time(object):
+class timestamp(object):
+	'''
+	This class accomodates the timestamp conversion of time given as seconds.
+	'''
 	hours = 0
 	mins = 0
 	secs = 0
@@ -22,6 +25,10 @@ class time(object):
 
 
 def getTranscript(transcriptID, APIKey):
+	'''
+	This function requests the capioapi for a transcript using the APIKey and TranscriptID
+	provided by the user.
+	'''
 	Error_codes = {'301': 'Moved Permanently',
 					'302': 'Found',
 					'304': 'Not Modified',
@@ -36,6 +43,7 @@ def getTranscript(transcriptID, APIKey):
 					'429': 'Too Many Requests',
 					'500': 'Internal Server Error'
 					}
+	
 	url = 'https://api.capio.ai/v1/speech/transcript/{}'.format(transcriptID)
 	head = {'apiKey': '{}'.format(APIKey), 'word_confidence': 'true'}
 	try:
@@ -43,6 +51,7 @@ def getTranscript(transcriptID, APIKey):
 	except ConnectionError:
 		print('Connection Failed')
 		return 'Unable to Connect'
+	
 	transcript = []
 	try:
 		result.raise_for_status()
@@ -54,16 +63,21 @@ def getTranscript(transcriptID, APIKey):
 		return transcript
 
 def createDocx(results, transcriptID):
-	purple = RGBColor(0x64, 0x62, 0x96)
-	red = RGBColor(0xfc, 0x2a, 0x35)
+	'''
+	This method creates a formattted document from the transcript
+	retreived from the getTrancript function
+	'''
+	purple = RGBColor(0x64, 0x62, 0x96) # Replicating the timestamp color provided in the example file
+	red = RGBColor(0xfc, 0x2a, 0x35) # Replicating the 'red' color provided in the example file
 	doc = Document()
-	results = sorted(results, key=lambda x: x['result_index'])
+	results = sorted(results, key=lambda x: x['result_index']) # Sorting the results in order just in case of some erroneous retreival from the server
 	for result in results:
 		alternatives = result['result']
-		scentence = alternatives[0]['alternative'][0]
+		scentence = alternatives[0]['alternative'][0] # Only taking into account the best transcript
 		transcript = scentence['transcript']
 		words = scentence['words']
-		start_time = time(words[0]['from'])
+		start_time = timestamp(words[0]['from'])
+
 		para = doc.add_paragraph('')
 		r = para.add_run('{}\t'.format(start_time))
 		r.bold = True
@@ -71,7 +85,9 @@ def createDocx(results, transcriptID):
 		for word in words:
 			r = para.add_run(' {}'.format(word['word']))
 			if word['confidence'] < 0.75:
+				# Marking words with low confidence in red color
 				r.font.color.rgb = red
+				
 	doc.save('{}.docx'.format(transcriptID))
 	path = os.path.abspath('{}.docx'.format(transcriptID))
 	return doc, path
