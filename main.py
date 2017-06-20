@@ -15,6 +15,10 @@ class timestamp(object):
 	millis = 0
 	
 	def __init__(self, seconds):
+		if seconds >= 86400: # Total number of seconds in a day
+			seconds %= 86400
+		if seconds < 0:
+			return
 		self.hours, temp = divmod(seconds, 3600)
 		self.mins, temp = divmod(temp, 60)
 		self.secs, self.millis = divmod(temp, 1)

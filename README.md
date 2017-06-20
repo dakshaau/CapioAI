@@ -8,7 +8,13 @@
 
 ### Testing:
 
-The code has assertions written into it. I haven't used any additional testing module to implement testcases
+`test.py` has **unittest** testing implemented to test the code.
+
+To run the tests, use the following command:
+
+```Batchfile
+python -m unittest test -v
+```
 
 ### Execution:
 
