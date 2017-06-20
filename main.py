@@ -47,16 +47,6 @@ def getTranscript(transcriptID, APIKey):
 					list of dicts, if server accepts the request
 	'''
 
-	try:
-		'''
-		Making sure that the input arguments are strings
-		'''
-		assert type(transcriptID) is str
-		assert type(APIKey) is str
-	except AssertionError:
-		return 'Invalid Parameter(s)'
-
-
 	Error_codes = {'301': 'Moved Permanently',
 					'302': 'Found',
 					'304': 'Not Modified',
@@ -107,91 +97,15 @@ def createDocx(results, transcriptID):
 	red = RGBColor(0xfc, 0x2a, 0x35) # Replicating the 'red' color provided in the example file
 	doc = Document()
 
-	try:
-		'''
-		The following assertions make sure that the results argument parameter has the following format:
-
-		[
-			{
-				'result': <value>
-				'result_index': <int value>
-			}
-		]
-		'''
-		assert type(transcriptID) is str
-		assert type(results) is list
-		assert len(results) > 0
-		assert type(results[0]) is dict
-		assert 'result_index' in results[0]
-		assert 'result' in results[0]
-		assert type(results[0]['result_index']) is int
-		assert -1 < results[0]['result_index'] < len(results)
-	except AssertionError:
-		return None, "Improper 'results' format!"
-	
 	results = sorted(results, key=lambda x: x['result_index']) # Sorting the results in order just in case of some erroneous retreival from the server
 	for result in results:
 		
 		alternatives = result['result']
 
-		try:
-			'''
-			The following assertions make sure that each 'result' has the following format:
-
-			[
-				{
-					'alternative': [
-									{
-										'confidence': <float value>
-									}
-					]
-				}
-			]
-			'''
-			assert type(alternatives) is list
-			assert type(alternatives[0]) is dict
-			assert 'alternative' in alternatives[0]
-			assert type(alternatives[0]['alternative']) is list
-			assert type(alternatives[0]['alternative'][0]) is dict
-			assert 'confidence' in alternatives[0]['alternative'][0]
-			assert (type(alternatives[0]['alternative'][0]['confidence']) is float) or (type(alternatives[0]['alternative'][0]['confidence']) is int)
-			assert alternatives[0]['alternative'][0]['confidence'] <= 1
-		except AssertionError:
-			return None, "Improper 'result' format!"
-
 		alternatives = sorted(alternatives[0]['alternative'], key=lambda x: x['confidence'], reverse=True) # Sorting w.r.t scentence level confidence
 		scentence = alternatives[0] # Only taking into account the best transcript
 		del alternatives
 		
-		try:
-			'''
-			Thw following assertions make sure that 'scentence' has the folowing format:
-
-			{
-				'words':[
-						{
-							'from': <float value>
-							'confidence': <float value>
-							'word': <string>
-						}
-				]
-			}
-			'''
-			assert type(scentence) is dict
-			assert 'words' in scentence
-			assert type(scentence['words']) is list
-			assert type(scentence['words'][0]) is dict
-			assert 'from' in scentence['words'][0]
-			assert 'confidence' in scentence['words'][0]
-			assert 'word' in scentence['words'][0]
-			assert (type(scentence['words'][0]['from']) is float) or (type(scentence['words'][0]['from']) is int)
-			assert scentence['words'][0]['from'] >= 0
-			assert (type(scentence['words'][0]['confidence']) is float) or (type(scentence['words'][0]['confidence']) is int)
-			assert scentence['words'][0]['confidence'] <= 1
-			assert type(scentence['words'][0]['word']) is str
-		except AssertionError:
-			return None, "Improper 'scentence' format!"
-
 		words = sorted(scentence['words'], key = lambda x: x['from']) # Sorting w.r.t time
 		start_time = timestamp(words[0]['from'])
 
