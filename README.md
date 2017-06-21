@@ -6,6 +6,8 @@
 
 **Packages Required:** python-docx, requests, bottle
 
+**Sections:** [Testing](https://github.com/dakshaau/CapioAI/tree/daksh#testing) [Execution](https://github.com/dakshaau/CapioAI/tree/daksh#execution) [Docker](https://github.com/dakshaau/CapioAI/tree/daksh#docker)
+
 ### Testing:
 
 `test.py` has **unittest** testing implemented to test the code.
