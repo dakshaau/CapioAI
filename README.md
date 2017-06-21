@@ -40,4 +40,4 @@ The requests are only accepted at the URL: `http://IP:PORT/transcript/<transcrip
 
 ## Docker:
 
-There is a containerized version of main module availablle that sends a request to CapioAI API and creates a docx file. Go to (docker_build) [docker_build/] for further instructions.
+There is a containerized version of main module availablle that sends a request to CapioAI API and creates a docx file. Go to (docker_build)[docker_build/] for further instructions.
