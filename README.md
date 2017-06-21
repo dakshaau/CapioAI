@@ -37,3 +37,7 @@ python server.py <IP> <PORT_as_integer>
 The server accepts **GET** requests with the request header having `apiKey` label and an associated string.
 
 The requests are only accepted at the URL: `http://IP:PORT/transcript/<transcriptID>`
+
+## Docker:
+
+There is a containerized version of main module availablle that sends a request to CapioAI API and creates a docx file. Go to (docker_build) [docker_build/] for further instructions.
