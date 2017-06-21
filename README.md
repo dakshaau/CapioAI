@@ -6,7 +6,11 @@
 
 **Packages Required:** python-docx, requests, bottle
 
-**Sections:** [Testing](https://github.com/dakshaau/CapioAI/tree/daksh#testing) [Execution](https://github.com/dakshaau/CapioAI/tree/daksh#execution) [Docker](https://github.com/dakshaau/CapioAI/tree/daksh#docker)
+**Sections:**
+
+- [Testing](https://github.com/dakshaau/CapioAI/tree/daksh#testing) 
+- [Execution](https://github.com/dakshaau/CapioAI/tree/daksh#execution)
+- [Docker](https://github.com/dakshaau/CapioAI/tree/daksh#docker)
 
 ### Testing:
 
