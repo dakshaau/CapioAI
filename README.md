@@ -44,6 +44,8 @@ The server accepts **GET** requests with the request header having `apiKey` labe
 
 The requests are only accepted at the URL: `http://IP:PORT/transcript/<transcriptID>`
 
+The response is either a `string` containing the error message or a `.docx` file. The response should be handled appropriately.
+
 ## Docker:
 
 There is a containerize version of server module available in [docker_build](docker_build/) in the form of an archive named as `CapioAI-server.tar.gz`.
@@ -55,9 +57,9 @@ docker load CapioAI-server.tar.gz
 docker run -it -p 8080:8080 --name capio-ai capio-ai
 ```
 
-The above commands will start the server within the contaainer.
+The above commands will start the server within the container.
 
-For **linux** systems, requests should be sent as:
+For **linux** systems, requests can be sent using `curl` as follows:
 
 ```shell
 curl -X GET http://0.0.0.0:8080/transcript/<transcriptID> --header "apiKey: <APIKey>" -o <filename>.docx
@@ -68,3 +70,5 @@ For **Windows** systems, requests should be sent as:
 ```shell
 curl -X GET http://<docker-machine-IP>:8080/transcript/<transcriptID> --header "apiKey: <APIKey>" -o <filename>.docx
 ```
+
+**NOTE:** The .docx file created with this request will either be a corrupt file, i.e. somekind of failure occured, or contain the formatted transcript, i.e. everything went well.
