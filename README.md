@@ -53,7 +53,7 @@ There is a containerize version of server module available in [docker_build](doc
 To run the server from the container, execute the commands as follows:
 
 ```shell
-docker load CapioAI-server.tar.gz
+docker load -i CapioAI-server.tar.gz
 docker run -it -p 8080:8080 --name capio-ai capio-ai
 ```
 
