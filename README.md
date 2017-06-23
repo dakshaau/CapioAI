@@ -6,6 +6,12 @@
 
 **Packages Required:** python-docx, requests, bottle
 
+## Updates:
+
+For updates after June 13, please check [this branch](https://github.com/dakshaau/CapioAI/tree/daksh)
+
+I have implemented Unit testing using `unittest` module of python and containerized the server. There is also a sample curl request to demonstrate how to retrieve the .docx file using the server I created.
+
 ### Testing:
 
 The code has assertions written into it. I haven't used any additional testing module to implement testcases
