@@ -18,7 +18,7 @@
 
 To run the tests, use the following command:
 
-```Batchfile
+```shell
 python -m unittest test -v
 ```
 
@@ -30,13 +30,13 @@ There are two options available, either use the executable script or run the ser
 
 To execute the script simply use the following command after navigating to the program directory:
 
-```Batchfile
+```shell
 python main.py <transcriptID> <APIKey>
 ```
 
 To run the server simply use the following command after navigating to the program directory:
 
-```Batchfile
+```shell
 python server.py <IP> <PORT_as_integer>
 ```
 
@@ -46,4 +46,25 @@ The requests are only accepted at the URL: `http://IP:PORT/transcript/<transcrip
 
 ## Docker:
 
-There is a containerized version of main module availablle that sends a request to CapioAI API and creates a docx file. Go to [docker_build](docker_build/) for further instructions.
+There is a containerize version of server module available in [docker_build](docker_build/) in the form of an archive named as `CapioAI-server.tar.gz`.
+
+To run the server from the container, execute the commands as follows:
+
+```shell
+docker load CapioAI-server.tar.gz
+docker run -it -p 8080:8080 --name capio-ai capio-ai
+```
+
+The above commands will start the server within the contaainer.
+
+For **linux** systems, requests should be sent as:
+
+```shell
+curl -X GET http://0.0.0.0:8080/transcript/<transcriptID> --header "apiKey: <APIKey>" -o <filename>.docx
+```
+
+For **Windows** systems, requests should be sent as:
+
+```shell
+curl -X GET http://<docker-machine-IP>:8080/transcript/<transcriptID> --header "apiKey: <APIKey>" -o <filename>.docx
+```
